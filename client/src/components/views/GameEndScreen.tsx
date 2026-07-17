@@ -60,7 +60,8 @@ const GameEndScreen: React.FC = () => {
                     {idx + 1}
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className={`font-bold text-lg ${p.id === playerId ? 'text-white' : 'text-slate-300'}`}>
+                    <span className={`font-bold text-lg flex items-center gap-2 ${p.id === playerId ? 'text-white' : 'text-slate-300'}`} style={{ color: p.color || 'inherit' }}>
+                      <span>{p.avatar}</span>
                       {p.name} {p.id === playerId && '(You)'}
                     </span>
                     {isWinnerItem && <span className="text-xs text-yellow-400 font-medium flex items-center gap-1"><Medal size={12}/> Winner</span>}

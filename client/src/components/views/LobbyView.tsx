@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSocket } from '../../context/SocketContext';
 import { Copy, Users, Settings, Play, Check } from 'lucide-react';
+import { ChatBox } from './ChatBox';
 
 const LobbyView: React.FC = () => {
   const { socket, room, playerId } = useSocket();
@@ -29,7 +30,7 @@ const LobbyView: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl animate-slide-up space-y-6">
+    <div className="w-full max-w-4xl animate-slide-up space-y-6">
       
       {/* Header & Link Share */}
       <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50">
@@ -55,7 +56,7 @@ const LobbyView: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Player List */}
         <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 flex flex-col">
           <div className="flex items-center gap-2 mb-4 text-slate-300">
@@ -67,15 +68,25 @@ const LobbyView: React.FC = () => {
             {room.players.map((p, i) => (
               <li key={p.id} className="flex items-center justify-between bg-slate-800/50 p-3 rounded-xl border border-slate-700/30">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-bold text-sm">
-                    {p.name.charAt(0).toUpperCase()}
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg" style={{ backgroundColor: p.color ? p.color + '40' : undefined, border: p.color ? `1px solid ${p.color}` : undefined }}>
+                    {p.avatar || p.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className={`font-medium ${p.id === playerId ? 'text-white' : 'text-slate-300'}`}>
+                  <span className={`font-medium ${p.id === playerId ? 'text-white' : 'text-slate-300'}`} style={{ color: p.color || 'inherit' }}>
                     {p.name} {p.id === playerId && '(You)'}
                   </span>
                 </div>
-                {p.isHost && <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-md font-medium">Host</span>}
-                {!p.connected && <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-md font-medium">Offline</span>}
+                <div className="flex items-center gap-2">
+                  {p.isHost && <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-md font-medium">Host</span>}
+                  {!p.connected && <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-md font-medium">Offline</span>}
+                  {isHost && !p.isHost && (
+                    <button 
+                      onClick={() => { if (window.confirm('Kick this player?')) socket.emit('kick_player', { playerId: p.id }); }} 
+                      className="text-red-400 hover:text-red-300 bg-red-400/10 hover:bg-red-400/20 px-2 py-1 rounded transition-colors text-xs border border-red-500/30"
+                    >
+                      Kick
+                    </button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
@@ -151,6 +162,11 @@ const LobbyView: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Chat Box */}
+        <div className="md:col-span-1 h-[450px]">
+          <ChatBox socket={socket} room={room} playerId={playerId!} />
         </div>
       </div>
     </div>

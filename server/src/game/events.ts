@@ -4,6 +4,9 @@ export interface Player {
   connected: boolean;
   isHost: boolean;
   score: number;
+  avatar: string;
+  color: string;
+  skips: number;
 }
 
 export interface RoomSettings {
@@ -17,6 +20,12 @@ export interface ChainItem {
   playerId: string | null;
 }
 
+export interface ChatMessage {
+  playerId: string;
+  text: string;
+  timestamp: number;
+}
+
 export interface RoomState {
   code: string;
   players: Player[];
@@ -27,6 +36,7 @@ export interface RoomState {
   usedWords: string[];
   activePlayerId: string | null;
   turnDeadline: number | null;
+  chat: ChatMessage[];
 }
 
 export interface ClientToServerEvents {
@@ -38,6 +48,9 @@ export interface ClientToServerEvents {
   rejoin_room: (data: { roomCode: string, playerId: string }, callback: (res: { success: boolean, error?: string }) => void) => void;
   leave_room: () => void;
   stop_game: () => void;
+  send_chat: (data: { text: string }) => void;
+  kick_player: (data: { playerId: string }) => void;
+  skip_turn: () => void;
 }
 
 export interface ServerToClientEvents {

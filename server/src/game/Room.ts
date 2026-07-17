@@ -1,4 +1,4 @@
-import { RoomState, Player, RoomSettings, ChainItem } from './events';
+import { RoomState, Player, RoomSettings, ChainItem, ChatMessage } from './events';
 import { GameLogic } from './GameLogic';
 
 export class Room {
@@ -15,6 +15,7 @@ export class Room {
   usedWords: Set<string> = new Set();
   activePlayerId: string | null = null;
   turnDeadline: number | null = null;
+  chat: ChatMessage[] = [];
 
   // Track who should start the next round
   private roundStarterIndex: number = 0;
@@ -34,13 +35,27 @@ export class Room {
       chain: this.chain,
       usedWords: Array.from(this.usedWords),
       activePlayerId: this.activePlayerId,
-      turnDeadline: this.turnDeadline
+      turnDeadline: this.turnDeadline,
+      chat: this.chat
     };
   }
 
   addPlayer(playerId: string, name: string): Player {
     const isHost = this.players.length === 0;
-    const player: Player = { id: playerId, name, connected: true, isHost, score: 0 };
+    
+    const emojis = ['🦊', '🐼', '🐨', '🐸', '🐙', '🐵', '🦄', '🦖', '🐉', '🦉'];
+    const colors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#10b981', '#22c55e', '#84cc16', '#eab308', '#f59e0b', '#f97316'];
+    
+    const usedEmojis = this.players.map(p => p.avatar);
+    const usedColors = this.players.map(p => p.color);
+    
+    const availableEmojis = emojis.filter(e => !usedEmojis.includes(e));
+    const availableColors = colors.filter(c => !usedColors.includes(c));
+    
+    const avatar = availableEmojis.length > 0 ? availableEmojis[Math.floor(Math.random() * availableEmojis.length)] : emojis[Math.floor(Math.random() * emojis.length)];
+    const color = availableColors.length > 0 ? availableColors[Math.floor(Math.random() * availableColors.length)] : colors[Math.floor(Math.random() * colors.length)];
+    
+    const player: Player = { id: playerId, name, connected: true, isHost, score: 0, avatar, color, skips: 1 };
     this.players.push(player);
     return player;
   }

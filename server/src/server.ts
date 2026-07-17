@@ -152,6 +152,53 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
     }
   });
 
+  socket.on('send_chat', ({ text }) => {
+    const room = getRoom();
+    if (!room) return;
+    const playerId = socket.data.playerId;
+    if (playerId) {
+      // Keep chat history small
+      if (room.chat.length > 50) room.chat.shift();
+      room.chat.push({ playerId, text, timestamp: Date.now() });
+      broadcastRoomUpdate(room);
+    }
+  });
+
+  socket.on('kick_player', ({ playerId }) => {
+    const room = getRoom();
+    if (!room) return;
+    const player = room.players.find(p => p.id === socket.data.playerId);
+    if (player && player.isHost && playerId !== player.id) {
+      room.removePlayer(playerId);
+      // force disconnect the kicked player
+      const targetSocket = io.sockets.sockets.get(playerId);
+      if (targetSocket) {
+        targetSocket.emit('error', { message: 'You have been kicked by the host.' });
+        targetSocket.disconnect(true);
+      }
+      broadcastRoomUpdate(room);
+    }
+  });
+
+  socket.on('skip_turn', () => {
+    const room = getRoom();
+    if (!room || room.status !== 'playing') return;
+    
+    if (room.activePlayerId !== socket.data.playerId) return;
+    
+    const player = room.players.find(p => p.id === socket.data.playerId);
+    if (player && player.skips > 0) {
+      player.skips -= 1;
+      room.chat.push({ playerId: 'system', text: `${player.name} used a Skip!`, timestamp: Date.now() });
+      
+      room.advanceTurn();
+      // Need setupTurnTimer but wait, setupTurnTimer is defined earlier in the scope.
+      // Yes, setupTurnTimer is available here.
+      setupTurnTimer(room);
+      broadcastRoomUpdate(room);
+    }
+  });
+
   socket.on('stop_game', () => {
     const room = getRoom();
     if (!room) return;

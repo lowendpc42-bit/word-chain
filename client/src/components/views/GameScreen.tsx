@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '../../context/SocketContext';
-import { Send, Clock, User, XCircle, CheckCircle } from 'lucide-react';
+import { Send, Clock, User, XCircle, CheckCircle, Volume2, VolumeX, FastForward } from 'lucide-react';
+import { ChatBox } from './ChatBox';
+import { playDing, playBuzz, playTick, setMuted } from '../../utils/audio';
 
 const GameScreen: React.FC = () => {
   const { socket, room, playerId, turnData, wordResult, clearWordResult } = useSocket();
   const [inputWord, setInputWord] = useState('');
   const [timeLeft, setTimeLeft] = useState(0);
   const [progress, setProgress] = useState(100);
+  const [isMuted, setIsMuted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const chainEndRef = useRef<HTMLDivElement>(null);
+  const isMyTurnRef = useRef(false);
 
   if (!room || !socket) return null;
 
   const isMyTurn = turnData?.activePlayerId === playerId;
+  isMyTurnRef.current = isMyTurn;
   const activePlayer = room.players.find(p => p.id === turnData?.activePlayerId);
   const isHost = room.players.find(p => p.id === playerId)?.isHost;
 
@@ -27,6 +32,13 @@ const GameScreen: React.FC = () => {
     chainEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [room.chain]);
 
+  useEffect(() => {
+    if (wordResult) {
+      if (wordResult.valid) playDing();
+      else playBuzz();
+    }
+  }, [wordResult]);
+
   // Timer logic
   useEffect(() => {
     if (!turnData?.deadline) return;
@@ -34,7 +46,14 @@ const GameScreen: React.FC = () => {
     const interval = setInterval(() => {
       const now = Date.now();
       const remaining = Math.max(0, turnData.deadline - now);
-      setTimeLeft(Math.ceil(remaining / 1000));
+      const newSecs = Math.ceil(remaining / 1000);
+      
+      setTimeLeft(prev => {
+        if (prev !== newSecs && newSecs <= 5 && newSecs > 0) {
+          playTick();
+        }
+        return newSecs;
+      });
       
       const totalTimeMs = room.settings.turnTimeSeconds * 1000;
       setProgress((remaining / totalTimeMs) * 100);
@@ -54,6 +73,11 @@ const GameScreen: React.FC = () => {
     clearWordResult();
   };
 
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    setMuted(!isMuted);
+  };
+
   const getTimerColor = () => {
     if (progress > 50) return 'bg-green-500';
     if (progress > 25) return 'bg-yellow-500';
@@ -61,14 +85,17 @@ const GameScreen: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl h-[90vh] flex flex-col md:flex-row gap-6 animate-slide-up">
+    <div className="w-full max-w-6xl h-[90vh] flex flex-col md:flex-row gap-6 animate-slide-up">
       
       {/* Left Column: Chain & Input */}
-      <div className="flex-1 flex flex-col bg-surface rounded-2xl shadow-xl border border-slate-700/50 overflow-hidden relative">
+      <div className="flex-1 flex flex-col bg-surface rounded-2xl shadow-xl border border-slate-700/50 overflow-hidden relative min-w-[300px]">
         {/* Header */}
         <div className="p-4 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center shrink-0">
-          <div>
+          <div className="flex items-center gap-4">
             <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Round {room.currentRound} / {room.settings.rounds}</h2>
+            <button onClick={toggleMute} className="text-slate-400 hover:text-white transition-colors" title={isMuted ? "Unmute" : "Mute"}>
+              {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            </button>
           </div>
           {turnData?.requiredLetter && (
             <div className="flex items-center gap-2 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-600">
@@ -86,7 +113,10 @@ const GameScreen: React.FC = () => {
             return (
               <div key={idx} className={`flex flex-col ${item.playerId === playerId ? 'items-end' : 'items-start'}`}>
                 {!isFirst && (
-                  <span className="text-xs text-slate-500 mb-1 font-medium">{player?.name || 'Unknown'}</span>
+                  <span className="text-xs text-slate-500 mb-1 font-medium flex items-center gap-1" style={{ color: player?.color || 'inherit' }}>
+                    <span>{player?.avatar}</span>
+                    {player?.name || 'Unknown'}
+                  </span>
                 )}
                 <div className={`px-4 py-2 rounded-2xl text-lg font-medium shadow-md ${
                   isFirst ? 'bg-slate-700 text-white' : 
@@ -139,6 +169,18 @@ const GameScreen: React.FC = () => {
             >
               <Send size={20} />
             </button>
+            <button
+              type="button"
+              disabled={!isMyTurn || (activePlayer?.skips || 0) === 0}
+              onClick={() => socket.emit('skip_turn')}
+              title={`Skip turn (${activePlayer?.skips || 0} left)`}
+              className={`px-4 rounded-xl flex items-center justify-center transition-all ${
+                isMyTurn && (activePlayer?.skips || 0) > 0 ? 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white border border-yellow-500/30' : 'bg-slate-700 text-slate-500 cursor-not-allowed hidden'
+              }`}
+            >
+              <FastForward size={20} />
+              <span className="ml-1 font-bold">{activePlayer?.skips || 0}</span>
+            </button>
           </form>
         </div>
       </div>
@@ -162,7 +204,8 @@ const GameScreen: React.FC = () => {
                 }`}
               >
                 <div className="flex flex-col">
-                  <span className={`font-medium text-sm truncate max-w-[120px] ${p.id === playerId ? 'text-white' : 'text-slate-300'}`}>
+                  <span className={`font-medium text-sm truncate max-w-[120px] flex items-center gap-1 ${p.id === playerId ? 'text-white' : 'text-slate-300'}`} style={{ color: p.color || 'inherit' }}>
+                    <span>{p.avatar}</span>
                     {p.name} {p.id === playerId && '(You)'}
                   </span>
                   {!p.connected && <span className="text-[10px] text-red-400">Offline</span>}
@@ -195,6 +238,11 @@ const GameScreen: React.FC = () => {
             End Game Early
           </button>
         )}
+      </div>
+
+      {/* Right Column: ChatBox */}
+      <div className="w-full md:w-72 flex flex-col shrink-0 h-[250px] md:h-full">
+        <ChatBox socket={socket} room={room} playerId={playerId!} />
       </div>
 
     </div>
