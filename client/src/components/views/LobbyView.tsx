@@ -33,13 +33,13 @@ const LobbyView: React.FC = () => {
     <div className="w-full max-w-4xl animate-slide-up space-y-6">
       
       {/* Header & Link Share */}
-      <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10">
+      <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-white mb-2">Room: <span className="text-primary font-mono tracking-widest">{room.code}</span></h2>
           <p className="text-slate-400">Invite friends using the link below</p>
         </div>
         
-        <div className="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/10 shadow-inner">
+        <div className="flex items-center gap-2 bg-slate-800/80 p-2 rounded-xl border border-slate-700">
           <input 
             type="text" 
             readOnly 
@@ -58,7 +58,7 @@ const LobbyView: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Player List */}
-        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10 flex flex-col">
+        <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 flex flex-col">
           <div className="flex items-center gap-2 mb-4 text-slate-300">
             <Users size={20} className="text-secondary" />
             <h3 className="font-semibold text-lg">Players ({room.players.length}/8)</h3>
@@ -66,7 +66,7 @@ const LobbyView: React.FC = () => {
           
           <ul className="space-y-3 flex-1 overflow-y-auto max-h-[300px] pr-2">
             {room.players.map((p, i) => (
-              <li key={p.id} className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5 shadow-sm">
+              <li key={p.id} className="flex items-center justify-between bg-slate-800/50 p-3 rounded-lg border border-slate-700/30">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg" style={{ backgroundColor: p.color ? p.color + '40' : undefined, border: p.color ? `1px solid ${p.color}` : undefined }}>
                     {p.avatar || p.name.charAt(0).toUpperCase()}
@@ -93,7 +93,7 @@ const LobbyView: React.FC = () => {
         </div>
 
         {/* Settings & Actions */}
-        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/10 flex flex-col justify-between gap-6">
+        <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 flex flex-col justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 mb-4 text-slate-300">
               <Settings size={20} className="text-primary" />
@@ -156,8 +156,8 @@ const LobbyView: React.FC = () => {
                 {room.players.length < 2 ? 'Waiting for players...' : 'Start Game'}
               </button>
             ) : (
-              <div className="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-bold text-center flex items-center justify-center gap-2 shadow-inner">
-                <div className="w-4 h-4 border-2 border-slate-300 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-full py-4 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-medium text-center flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
                 Waiting for host to start...
               </div>
             )}

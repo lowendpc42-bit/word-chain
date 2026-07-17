@@ -17,8 +17,8 @@ export const ChatBox = ({ socket, room, playerId }: { socket: any, room: any, pl
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900/40 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-      <div className="bg-white/5 p-3 border-b border-white/10 font-bold text-slate-200 text-sm shadow-sm">
+    <div className="flex flex-col h-full bg-slate-900/50 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+      <div className="bg-slate-800/80 p-3 border-b border-slate-700 font-bold text-slate-200 text-sm">
         Room Chat
       </div>
       
@@ -29,7 +29,7 @@ export const ChatBox = ({ socket, room, playerId }: { socket: any, room: any, pl
         {room.chat?.map((c: any, i: number) => {
           if (c.playerId === 'system') {
             return (
-              <div key={i} className="text-center text-xs text-slate-300 font-medium italic bg-white/10 border border-white/10 rounded-lg py-1 px-3 mx-auto w-fit shadow-inner">
+              <div key={i} className="text-center text-xs text-slate-400 italic bg-slate-800/50 rounded py-1 px-2 mx-auto w-fit">
                 {c.text}
               </div>
             );
@@ -45,7 +45,7 @@ export const ChatBox = ({ socket, room, playerId }: { socket: any, room: any, pl
                 {isMe && <span>{player?.avatar}</span>}
               </div>
               <div 
-                className={`px-3 py-2 rounded-xl text-sm max-w-[90%] break-words shadow-md backdrop-blur-md font-medium ${isMe ? 'bg-primary/80 text-white rounded-tr-none border border-primary/50' : 'bg-white/10 text-slate-200 rounded-tl-none border border-white/10'}`}
+                className={`px-3 py-1.5 rounded-xl text-sm max-w-[90%] break-words ${isMe ? 'bg-primary text-white rounded-tr-none' : 'bg-slate-800 text-slate-200 rounded-tl-none border border-slate-700'}`}
               >
                 {c.text}
               </div>
@@ -55,18 +55,18 @@ export const ChatBox = ({ socket, room, playerId }: { socket: any, room: any, pl
         <div ref={chatEndRef} />
       </div>
       
-      <form onSubmit={handleSend} className="p-3 bg-white/5 border-t border-white/10 flex gap-2">
+      <form onSubmit={handleSend} className="p-2 bg-slate-800/50 border-t border-slate-700 flex gap-2">
         <input
           type="text"
           value={msg}
           onChange={e => setMsg(e.target.value)}
           placeholder="Message..."
-          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white/10 transition-all shadow-inner"
+          className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-primary transition-colors"
         />
         <button 
           type="submit"
           disabled={!msg.trim()}
-          className="px-3 py-2 bg-primary hover:bg-blue-500 disabled:bg-white/5 disabled:text-slate-500 disabled:border disabled:border-white/5 border border-primary/50 text-white rounded-lg transition-colors flex items-center justify-center shadow-md"
+          className="px-3 py-1.5 bg-primary hover:bg-primary-hover disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors flex items-center justify-center"
         >
           <Send size={14} />
         </button>

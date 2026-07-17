@@ -88,9 +88,9 @@ const GameScreen: React.FC = () => {
     <div className="w-full max-w-6xl h-[90vh] flex flex-col md:flex-row gap-6 animate-slide-up">
       
       {/* Left Column: Chain & Input */}
-      <div className="flex-1 flex flex-col bg-slate-900/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden relative min-w-[300px]">
+      <div className="flex-1 flex flex-col bg-surface rounded-2xl shadow-xl border border-slate-700/50 overflow-hidden relative min-w-[300px]">
         {/* Header */}
-        <div className="p-4 bg-white/5 border-b border-white/10 flex justify-between items-center shrink-0">
+        <div className="p-4 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-4">
             <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Round {room.currentRound} / {room.settings.rounds}</h2>
             <button onClick={toggleMute} className="text-slate-400 hover:text-white transition-colors" title={isMuted ? "Unmute" : "Mute"}>
@@ -98,8 +98,8 @@ const GameScreen: React.FC = () => {
             </button>
           </div>
           {turnData?.requiredLetter && (
-            <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full border border-white/10 shadow-inner">
-              <span className="text-sm text-slate-300">Must start with</span>
+            <div className="flex items-center gap-2 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-600">
+              <span className="text-sm text-slate-400">Must start with</span>
               <span className="text-xl font-black text-white">{turnData.requiredLetter.toUpperCase()}</span>
             </div>
           )}
@@ -118,9 +118,9 @@ const GameScreen: React.FC = () => {
                     {player?.name || 'Unknown'}
                   </span>
                 )}
-                <div className={`px-4 py-2 rounded-2xl text-lg font-bold shadow-lg backdrop-blur-md ${
-                  isFirst ? 'bg-white/20 text-white border border-white/20' : 
-                  item.playerId === playerId ? 'bg-primary/80 text-white rounded-br-sm border border-primary/50' : 'bg-white/10 text-white border border-white/10 rounded-bl-sm'
+                <div className={`px-4 py-2 rounded-2xl text-lg font-medium shadow-md ${
+                  isFirst ? 'bg-slate-700 text-white' : 
+                  item.playerId === playerId ? 'bg-primary text-white rounded-br-sm' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-sm'
                 }`}>
                   {item.word}
                 </div>
@@ -139,15 +139,15 @@ const GameScreen: React.FC = () => {
         )}
 
         {/* Timer Bar */}
-        <div className="h-1.5 w-full bg-white/5 shrink-0">
+        <div className="h-1.5 w-full bg-slate-800 shrink-0">
           <div 
-            className={`h-full transition-all duration-100 ease-linear ${getTimerColor()} shadow-[0_0_10px_currentColor]`}
+            className={`h-full transition-all duration-100 ease-linear ${getTimerColor()}`}
             style={{ width: `${progress}%` }}
           />
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-white/5 shrink-0 border-t border-white/10">
+        <div className="p-4 bg-slate-800/80 shrink-0">
           <form onSubmit={handleSubmit} className="flex gap-2 relative">
             <input
               ref={inputRef}
@@ -156,15 +156,15 @@ const GameScreen: React.FC = () => {
               onChange={(e) => setInputWord(e.target.value)}
               disabled={!isMyTurn}
               placeholder={isMyTurn ? `Starts with ${turnData?.requiredLetter.toUpperCase()}...` : `${activePlayer?.name}'s turn...`}
-              className={`flex-1 bg-white/5 border rounded-xl px-4 py-3 text-lg font-bold text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-inner backdrop-blur-sm ${
-                isMyTurn ? 'border-primary/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'border-white/10 opacity-70 cursor-not-allowed'
+              className={`flex-1 bg-slate-900 border rounded-xl px-4 py-3 text-lg font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                isMyTurn ? 'border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'border-slate-700 opacity-70 cursor-not-allowed'
               }`}
             />
             <button
               type="submit"
               disabled={!isMyTurn || !inputWord.trim()}
               className={`px-6 rounded-xl flex items-center justify-center transition-all ${
-                isMyTurn && inputWord.trim() ? 'bg-primary hover:bg-blue-600 text-white shadow-lg transform hover:-translate-y-0.5 border border-primary/50' : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
+                isMyTurn && inputWord.trim() ? 'bg-primary hover:bg-blue-600 text-white shadow-lg transform hover:-translate-y-0.5' : 'bg-slate-700 text-slate-500 cursor-not-allowed'
               }`}
             >
               <Send size={20} />
@@ -175,7 +175,7 @@ const GameScreen: React.FC = () => {
               onClick={() => socket.emit('skip_turn')}
               title={`Skip turn (${activePlayer?.skips || 0} left)`}
               className={`px-4 rounded-xl flex items-center justify-center transition-all ${
-                isMyTurn && (activePlayer?.skips || 0) > 0 ? 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white border border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'bg-white/5 text-slate-500 cursor-not-allowed hidden border border-white/5'
+                isMyTurn && (activePlayer?.skips || 0) > 0 ? 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white border border-yellow-500/30' : 'bg-slate-700 text-slate-500 cursor-not-allowed hidden'
               }`}
             >
               <FastForward size={20} />
@@ -187,7 +187,7 @@ const GameScreen: React.FC = () => {
 
       {/* Right Column: Scoreboard */}
       <div className="w-full md:w-64 flex flex-col gap-4 shrink-0">
-        <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 p-4">
+        <div className="bg-surface rounded-2xl shadow-xl border border-slate-700/50 p-4">
           <div className="flex items-center gap-2 mb-4 text-slate-300">
             <Clock size={18} className={timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-slate-400'} />
             <h3 className="font-semibold text-lg">{timeLeft}s left</h3>
@@ -199,12 +199,12 @@ const GameScreen: React.FC = () => {
             {[...room.players].sort((a, b) => b.score - a.score).map((p, idx) => (
               <div 
                 key={p.id} 
-                className={`flex items-center justify-between p-2.5 rounded-xl border ${
-                  p.id === turnData?.activePlayerId ? 'bg-primary/20 border-primary/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'bg-white/5 border-white/5'
+                className={`flex items-center justify-between p-2 rounded-lg border ${
+                  p.id === turnData?.activePlayerId ? 'bg-primary/20 border-primary animate-pulse-border' : 'bg-slate-800/50 border-transparent'
                 }`}
               >
                 <div className="flex flex-col">
-                  <span className={`font-bold text-sm truncate max-w-[120px] flex items-center gap-1 ${p.id === playerId ? 'text-white' : 'text-slate-300'}`} style={{ color: p.color || 'inherit' }}>
+                  <span className={`font-medium text-sm truncate max-w-[120px] flex items-center gap-1 ${p.id === playerId ? 'text-white' : 'text-slate-300'}`} style={{ color: p.color || 'inherit' }}>
                     <span>{p.avatar}</span>
                     {p.name} {p.id === playerId && '(You)'}
                   </span>
@@ -217,9 +217,9 @@ const GameScreen: React.FC = () => {
         </div>
         
         {wordResult && wordResult.valid && wordResult.pointsAwarded && (
-          <div className="bg-green-500/20 backdrop-blur-md border border-green-500/50 rounded-2xl p-3 flex items-center gap-2 animate-slide-up text-green-400 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+          <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-3 flex items-center gap-2 animate-slide-up text-green-400">
             <CheckCircle size={18} />
-            <span className="font-bold text-sm text-green-100">
+            <span className="font-medium text-sm text-green-100">
               +{wordResult.pointsAwarded} pts!
             </span>
           </div>

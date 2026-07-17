@@ -37,7 +37,7 @@ const GameEndScreen: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/10 mb-8 max-w-lg mx-auto">
+      <div className="bg-surface rounded-3xl p-8 shadow-2xl border border-slate-700/50 mb-8 max-w-lg mx-auto">
         <h2 className="text-xl font-bold text-slate-300 mb-6 uppercase tracking-widest">Final Leaderboard</h2>
         
         <div className="space-y-4">
@@ -47,15 +47,15 @@ const GameEndScreen: React.FC = () => {
             return (
               <div 
                 key={p.id} 
-                className={`flex items-center justify-between p-4 rounded-xl backdrop-blur-sm ${
+                className={`flex items-center justify-between p-4 rounded-xl ${
                   isWinnerItem 
-                    ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]' 
-                    : 'bg-white/5 border border-white/10'
+                    ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30' 
+                    : 'bg-slate-800/50 border border-slate-700/50'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold shadow-inner ${
-                    isFirst ? 'bg-yellow-500 text-yellow-900' : 'bg-white/10 text-slate-300'
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    isFirst ? 'bg-yellow-500 text-yellow-900' : 'bg-slate-700 text-slate-400'
                   }`}>
                     {idx + 1}
                   </div>
@@ -79,7 +79,7 @@ const GameEndScreen: React.FC = () => {
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <button 
           onClick={handlePlayAgain}
-          className="bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md text-white font-bold py-4 px-8 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+          className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
         >
           <Home size={20} />
           Back to Home
