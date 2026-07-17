@@ -91,20 +91,17 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
   const setupTurnTimer = (room: Room) => {
     room.setTimerCallback(() => {
       // Timeout
-      const failedPlayer = room.activePlayerId;
-      room.endRound('timeout', failedPlayer || undefined);
-      
-      const scores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
-      io.to(room.code).emit('round_ended', { reason: 'timeout', failedPlayerId: failedPlayer || undefined, scores });
-      broadcastRoomUpdate(room);
+      const failedPlayerId = room.activePlayerId;
+      const player = room.players.find(p => p.id === failedPlayerId);
+      if (player) {
+        player.score -= 20;
+        room.chat.push({ playerId: 'system', text: `${player.name} ran out of time! (-20 pts)`, timestamp: Date.now() });
+      }
 
-      // Auto start next round after 5 seconds
-      setTimeout(() => {
-        const r = roomManager.getRoom(room.code);
-        if (r && r.status === 'round-end') {
-          startNewRoundOrEndGame(r);
-        }
-      }, 5000);
+      // Instead of ending the round, just advance the turn
+      room.advanceTurn();
+      setupTurnTimer(room);
+      broadcastRoomUpdate(room);
     });
 
     const reqLetter = room.chain.length > 0 ? room.chain[room.chain.length - 1].word.slice(-1) : '';
@@ -274,10 +271,31 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
         updatedChain: room.chain
       });
 
-      room.advanceTurn();
-      setupTurnTimer(room);
-      broadcastRoomUpdate(room);
+      if (room.chain.length >= 15) {
+        // Round completed successfully
+        room.endRound('chain_completed', undefined);
+        const scores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
+        io.to(room.code).emit('round_ended', { reason: 'chain_completed', scores });
+        broadcastRoomUpdate(room);
+
+        setTimeout(() => {
+          const r = roomManager.getRoom(room.code);
+          if (r && r.status === 'round-end') {
+            startNewRoundOrEndGame(r);
+          }
+        }, 5000);
+      } else {
+        room.advanceTurn();
+        setupTurnTimer(room);
+        broadcastRoomUpdate(room);
+      }
     } else {
+      const player = room.players.find(p => p.id === socket.data.playerId);
+      if (player) {
+        player.score -= 20;
+        room.chat.push({ playerId: 'system', text: `${player.name} submitted an invalid word! (-20 pts)`, timestamp: Date.now() });
+      }
+
       io.to(room.code).emit('word_result', {
         playerId: socket.data.playerId!,
         word: cleanWord,
@@ -286,18 +304,10 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
         updatedChain: room.chain
       });
 
-      // Break round
-      room.endRound(reason, socket.data.playerId!);
-      const scores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
-      io.to(room.code).emit('round_ended', { reason, failedPlayerId: socket.data.playerId!, scores });
+      // Continue round, just advance turn
+      room.advanceTurn();
+      setupTurnTimer(room);
       broadcastRoomUpdate(room);
-
-      setTimeout(() => {
-        const r = roomManager.getRoom(room.code);
-        if (r && r.status === 'round-end') {
-          startNewRoundOrEndGame(r);
-        }
-      }, 5000);
     }
   });
 
