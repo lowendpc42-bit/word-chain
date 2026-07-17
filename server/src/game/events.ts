@@ -37,6 +37,7 @@ export interface ClientToServerEvents {
   submit_word: (data: { word: string }) => void;
   rejoin_room: (data: { roomCode: string, playerId: string }, callback: (res: { success: boolean, error?: string }) => void) => void;
   leave_room: () => void;
+  stop_game: () => void;
 }
 
 export interface ServerToClientEvents {

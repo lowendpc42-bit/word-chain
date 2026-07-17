@@ -152,6 +152,23 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
     }
   });
 
+  socket.on('stop_game', () => {
+    const room = getRoom();
+    if (!room) return;
+    const player = room.players.find(p => p.id === socket.data.playerId);
+    
+    // Only the host can stop the game
+    if (player && player.isHost && (room.status === 'playing' || room.status === 'round-end')) {
+      room.status = 'game-end';
+      const finalScores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
+      const maxScore = Math.max(...room.players.map(p => p.score));
+      const winnerIds = room.players.filter(p => p.score === maxScore).map(p => p.id);
+      
+      io.to(room.code).emit('game_ended', { finalScores, winnerIds });
+      broadcastRoomUpdate(room);
+    }
+  });
+
   socket.on('submit_word', ({ word }) => {
     const room = getRoom();
     if (!room || room.status !== 'playing') return;

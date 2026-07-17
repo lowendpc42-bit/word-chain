@@ -14,6 +14,7 @@ const GameScreen: React.FC = () => {
 
   const isMyTurn = turnData?.activePlayerId === playerId;
   const activePlayer = room.players.find(p => p.id === turnData?.activePlayerId);
+  const isHost = room.players.find(p => p.id === playerId)?.isHost;
 
   useEffect(() => {
     if (isMyTurn && inputRef.current) {
@@ -179,6 +180,20 @@ const GameScreen: React.FC = () => {
               +{wordResult.pointsAwarded} pts!
             </span>
           </div>
+        )}
+
+        {isHost && (
+          <button 
+            onClick={() => {
+              if (window.confirm('Are you sure you want to end the game early?')) {
+                socket.emit('stop_game');
+              }
+            }}
+            className="mt-auto w-full py-3 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+          >
+            <XCircle size={18} />
+            End Game Early
+          </button>
         )}
       </div>
 
