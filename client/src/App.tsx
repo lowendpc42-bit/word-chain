@@ -11,7 +11,7 @@ function AppContent() {
   const { room, error, setError } = useSocket();
 
   return (
-    <div className="min-h-screen bg-background text-white flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background text-textMain flex flex-col items-center justify-center p-4">
       {/* Foreground Content */}
       <div className="w-full flex flex-col items-center justify-center">
       {error && (

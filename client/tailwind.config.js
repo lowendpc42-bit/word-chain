@@ -7,17 +7,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B0F19',
-        surface: '#1A2333',
-        primary: '#3B82F6',
-        secondary: '#8B5CF6',
-        accent: '#F43F5E',
+        background: '#F9F8F6',
+        surface: '#FFFFFF',
+        primary: '#D97757',
+        'primary-hover': '#C66545',
+        secondary: '#535250',
+        border: '#EAE9E4',
+        textMain: '#2D2D2D',
+        textMuted: '#737373',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-      },
-      animation: {
-        blob: "blob 15s infinite",
+        serif: ['ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
       },
       keyframes: {
         blob: {

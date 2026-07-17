@@ -88,19 +88,19 @@ const GameScreen: React.FC = () => {
     <div className="w-full max-w-6xl h-[90vh] flex flex-col md:flex-row gap-6 animate-slide-up">
       
       {/* Left Column: Chain & Input */}
-      <div className="flex-1 flex flex-col bg-surface rounded-2xl shadow-xl border border-slate-700/50 overflow-hidden relative min-w-[300px]">
+      <div className="flex-1 flex flex-col bg-surface rounded-2xl shadow-sm border border-border overflow-hidden relative min-w-[300px]">
         {/* Header */}
-        <div className="p-4 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center shrink-0">
+        <div className="p-4 bg-background border-b border-border flex justify-between items-center shrink-0">
           <div className="flex items-center gap-4">
-            <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Round {room.currentRound} / {room.settings.rounds}</h2>
-            <button onClick={toggleMute} className="text-slate-400 hover:text-white transition-colors" title={isMuted ? "Unmute" : "Mute"}>
+            <h2 className="text-xl font-serif text-textMain">Round {room.currentRound} / {room.settings.rounds}</h2>
+            <button onClick={toggleMute} className="text-textMuted hover:text-textMain transition-colors" title={isMuted ? "Unmute" : "Mute"}>
               {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
             </button>
           </div>
           {turnData?.requiredLetter && (
-            <div className="flex items-center gap-2 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-600">
-              <span className="text-sm text-slate-400">Must start with</span>
-              <span className="text-xl font-black text-white">{turnData.requiredLetter.toUpperCase()}</span>
+            <div className="flex items-center gap-2 bg-surface px-3 py-1.5 rounded-full border border-border shadow-sm">
+              <span className="text-sm text-textMuted">Must start with</span>
+              <span className="text-xl font-black text-textMain">{turnData.requiredLetter.toUpperCase()}</span>
             </div>
           )}
         </div>
@@ -113,14 +113,14 @@ const GameScreen: React.FC = () => {
             return (
               <div key={idx} className={`flex flex-col ${item.playerId === playerId ? 'items-end' : 'items-start'}`}>
                 {!isFirst && (
-                  <span className="text-xs text-slate-500 mb-1 font-medium flex items-center gap-1" style={{ color: player?.color || 'inherit' }}>
+                  <span className="text-xs text-textMuted mb-1 font-medium flex items-center gap-1" style={{ color: player?.color || 'inherit' }}>
                     <span>{player?.avatar}</span>
                     {player?.name || 'Unknown'}
                   </span>
                 )}
-                <div className={`px-4 py-2 rounded-2xl text-lg font-medium shadow-md ${
-                  isFirst ? 'bg-slate-700 text-white' : 
-                  item.playerId === playerId ? 'bg-primary text-white rounded-br-sm' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-sm'
+                <div className={`px-4 py-2 rounded-2xl text-lg shadow-sm ${
+                  isFirst ? 'bg-background border border-border text-textMuted' : 
+                  item.playerId === playerId ? 'bg-primary text-white rounded-br-sm font-medium' : 'bg-surface border border-border text-textMain rounded-bl-sm font-medium'
                 }`}>
                   {item.word}
                 </div>
@@ -139,7 +139,7 @@ const GameScreen: React.FC = () => {
         )}
 
         {/* Timer Bar */}
-        <div className="h-1.5 w-full bg-slate-800 shrink-0">
+        <div className="h-1.5 w-full bg-background border-y border-border shrink-0">
           <div 
             className={`h-full transition-all duration-100 ease-linear ${getTimerColor()}`}
             style={{ width: `${progress}%` }}
@@ -147,7 +147,7 @@ const GameScreen: React.FC = () => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-slate-800/80 shrink-0">
+        <div className="p-4 bg-background shrink-0">
           <form onSubmit={handleSubmit} className="flex gap-2 relative">
             <input
               ref={inputRef}
@@ -156,15 +156,15 @@ const GameScreen: React.FC = () => {
               onChange={(e) => setInputWord(e.target.value)}
               disabled={!isMyTurn}
               placeholder={isMyTurn ? `Starts with ${turnData?.requiredLetter.toUpperCase()}...` : `${activePlayer?.name}'s turn...`}
-              className={`flex-1 bg-slate-900 border rounded-xl px-4 py-3 text-lg font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
-                isMyTurn ? 'border-primary shadow-[0_0_15px_rgba(59,130,246,0.3)]' : 'border-slate-700 opacity-70 cursor-not-allowed'
+              className={`flex-1 bg-surface border rounded-xl px-4 py-3 text-lg font-medium text-textMain placeholder-textMuted/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm ${
+                isMyTurn ? 'border-primary' : 'border-border opacity-70 cursor-not-allowed'
               }`}
             />
             <button
               type="submit"
               disabled={!isMyTurn || !inputWord.trim()}
               className={`px-6 rounded-xl flex items-center justify-center transition-all ${
-                isMyTurn && inputWord.trim() ? 'bg-primary hover:bg-blue-600 text-white shadow-lg transform hover:-translate-y-0.5' : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                isMyTurn && inputWord.trim() ? 'bg-primary hover:bg-primary-hover text-white shadow-md transform hover:-translate-y-0.5' : 'bg-surface border border-border text-textMuted/50 cursor-not-allowed'
               }`}
             >
               <Send size={20} />
@@ -175,7 +175,7 @@ const GameScreen: React.FC = () => {
               onClick={() => socket.emit('skip_turn')}
               title={`Skip turn (${activePlayer?.skips || 0} left)`}
               className={`px-4 rounded-xl flex items-center justify-center transition-all ${
-                isMyTurn && (activePlayer?.skips || 0) > 0 ? 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white border border-yellow-500/30' : 'bg-slate-700 text-slate-500 cursor-not-allowed hidden'
+                isMyTurn && (activePlayer?.skips || 0) > 0 ? 'bg-surface border border-border text-textMuted hover:text-primary hover:border-primary shadow-sm' : 'bg-surface border border-border text-textMuted/50 hidden'
               }`}
             >
               <FastForward size={20} />
@@ -187,39 +187,39 @@ const GameScreen: React.FC = () => {
 
       {/* Right Column: Scoreboard */}
       <div className="w-full md:w-64 flex flex-col gap-4 shrink-0">
-        <div className="bg-surface rounded-2xl shadow-xl border border-slate-700/50 p-4">
-          <div className="flex items-center gap-2 mb-4 text-slate-300">
-            <Clock size={18} className={timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-slate-400'} />
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-4">
+          <div className="flex items-center gap-2 mb-4 text-textMain">
+            <Clock size={18} className={timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-textMuted'} />
             <h3 className="font-semibold text-lg">{timeLeft}s left</h3>
           </div>
           
           <div className="space-y-2">
-            <div className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Scores</div>
+            <div className="text-sm font-medium text-textMuted/70 uppercase tracking-wider mb-2">Scores</div>
             {/* Sort players by score desc */}
             {[...room.players].sort((a, b) => b.score - a.score).map((p, idx) => (
               <div 
                 key={p.id} 
                 className={`flex items-center justify-between p-2 rounded-lg border ${
-                  p.id === turnData?.activePlayerId ? 'bg-primary/20 border-primary animate-pulse-border' : 'bg-slate-800/50 border-transparent'
+                  p.id === turnData?.activePlayerId ? 'bg-surface border-primary/50 shadow-sm' : 'bg-background border-border'
                 }`}
               >
                 <div className="flex flex-col">
-                  <span className={`font-medium text-sm truncate max-w-[120px] flex items-center gap-1 ${p.id === playerId ? 'text-white' : 'text-slate-300'}`} style={{ color: p.color || 'inherit' }}>
+                  <span className={`font-medium text-sm truncate max-w-[120px] flex items-center gap-1 ${p.id === playerId ? 'text-textMain font-bold' : 'text-textMuted'}`} style={{ color: p.color || 'inherit' }}>
                     <span>{p.avatar}</span>
                     {p.name} {p.id === playerId && '(You)'}
                   </span>
-                  {!p.connected && <span className="text-[10px] text-red-400">Offline</span>}
+                  {!p.connected && <span className="text-[10px] text-red-500">Offline</span>}
                 </div>
-                <span className="font-bold text-secondary">{p.score}</span>
+                <span className="font-bold text-primary">{p.score}</span>
               </div>
             ))}
           </div>
         </div>
         
         {wordResult && wordResult.valid && wordResult.pointsAwarded && (
-          <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-3 flex items-center gap-2 animate-slide-up text-green-400">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2 animate-slide-up text-green-700 shadow-sm">
             <CheckCircle size={18} />
-            <span className="font-medium text-sm text-green-100">
+            <span className="font-medium text-sm text-green-800">
               +{wordResult.pointsAwarded} pts!
             </span>
           </div>
@@ -232,7 +232,7 @@ const GameScreen: React.FC = () => {
                 socket.emit('stop_game');
               }
             }}
-            className="mt-auto w-full py-3 bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+            className="mt-auto w-full py-3 bg-background text-red-600 hover:bg-red-50 border border-red-200 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
           >
             <XCircle size={18} />
             End Game Early

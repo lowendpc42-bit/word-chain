@@ -33,18 +33,18 @@ const LobbyView: React.FC = () => {
     <div className="w-full max-w-4xl animate-slide-up space-y-6">
       
       {/* Header & Link Share */}
-      <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50">
+      <div className="bg-surface rounded-2xl p-6 shadow-sm border border-border">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-white mb-2">Room: <span className="text-primary font-mono tracking-widest">{room.code}</span></h2>
-          <p className="text-slate-400">Invite friends using the link below</p>
+          <h2 className="text-3xl font-serif text-textMain mb-2">Room: <span className="text-primary font-mono tracking-widest">{room.code}</span></h2>
+          <p className="text-textMuted">Invite friends using the link below</p>
         </div>
         
-        <div className="flex items-center gap-2 bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+        <div className="flex items-center gap-2 bg-background p-2 rounded-xl border border-border">
           <input 
             type="text" 
             readOnly 
             value={shareableLink}
-            className="bg-transparent flex-1 outline-none px-3 text-slate-300 font-medium truncate"
+            className="bg-transparent flex-1 outline-none px-3 text-textMain font-medium truncate"
           />
           <button 
             onClick={handleCopy}
@@ -58,20 +58,20 @@ const LobbyView: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Player List */}
-        <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 flex flex-col">
-          <div className="flex items-center gap-2 mb-4 text-slate-300">
+        <div className="bg-surface rounded-2xl p-6 shadow-sm border border-border flex flex-col">
+          <div className="flex items-center gap-2 mb-4 text-textMain">
             <Users size={20} className="text-secondary" />
             <h3 className="font-semibold text-lg">Players ({room.players.length}/8)</h3>
           </div>
           
           <ul className="space-y-3 flex-1 overflow-y-auto max-h-[300px] pr-2">
             {room.players.map((p, i) => (
-              <li key={p.id} className="flex items-center justify-between bg-slate-800/50 p-3 rounded-lg border border-slate-700/30">
+              <li key={p.id} className="flex items-center justify-between bg-background p-3 rounded-lg border border-border">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg" style={{ backgroundColor: p.color ? p.color + '40' : undefined, border: p.color ? `1px solid ${p.color}` : undefined }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg" style={{ backgroundColor: p.color ? p.color + '20' : undefined, border: p.color ? `1px solid ${p.color}` : undefined }}>
                     {p.avatar || p.name.charAt(0).toUpperCase()}
                   </div>
-                  <span className={`font-medium ${p.id === playerId ? 'text-white' : 'text-slate-300'}`} style={{ color: p.color || 'inherit' }}>
+                  <span className={`font-medium ${p.id === playerId ? 'text-textMain font-bold' : 'text-textMuted'}`} style={{ color: p.color || 'inherit' }}>
                     {p.name} {p.id === playerId && '(You)'}
                   </span>
                 </div>
@@ -93,9 +93,9 @@ const LobbyView: React.FC = () => {
         </div>
 
         {/* Settings & Actions */}
-        <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 flex flex-col justify-between gap-6">
+        <div className="bg-surface rounded-2xl p-6 shadow-sm border border-border flex flex-col justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2 mb-4 text-slate-300">
+            <div className="flex items-center gap-2 mb-4 text-textMain">
               <Settings size={20} className="text-primary" />
               <h3 className="font-semibold text-lg">Game Settings</h3>
             </div>
@@ -103,8 +103,8 @@ const LobbyView: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between mb-1">
-                  <label className="text-sm text-slate-400">Rounds</label>
-                  <span className="text-sm font-medium text-white">{room.settings.rounds}</span>
+                  <label className="text-sm text-textMuted">Rounds</label>
+                  <span className="text-sm font-medium text-textMain">{room.settings.rounds}</span>
                 </div>
                 <input 
                   type="range" min="1" max="15" 
@@ -117,8 +117,8 @@ const LobbyView: React.FC = () => {
               
               <div>
                 <div className="flex justify-between mb-1">
-                  <label className="text-sm text-slate-400">Turn Timer</label>
-                  <span className="text-sm font-medium text-white">{room.settings.turnTimeSeconds}s</span>
+                  <label className="text-sm text-textMuted">Turn Timer</label>
+                  <span className="text-sm font-medium text-textMain">{room.settings.turnTimeSeconds}s</span>
                 </div>
                 <input 
                   type="range" min="10" max="60" step="5"
@@ -131,8 +131,8 @@ const LobbyView: React.FC = () => {
 
               <div>
                 <div className="flex justify-between mb-1">
-                  <label className="text-sm text-slate-400">Min Word Length</label>
-                  <span className="text-sm font-medium text-white">{room.settings.minWordLength}</span>
+                  <label className="text-sm text-textMuted">Min Word Length</label>
+                  <span className="text-sm font-medium text-textMain">{room.settings.minWordLength}</span>
                 </div>
                 <input 
                   type="range" min="2" max="5"
@@ -150,14 +150,14 @@ const LobbyView: React.FC = () => {
               <button 
                 onClick={handleStart}
                 disabled={room.players.length < 2}
-                className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all transform ${room.players.length >= 2 ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
+                className={`w-full py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${room.players.length >= 2 ? 'bg-primary hover:bg-primary-hover text-white shadow-md hover:shadow-lg' : 'bg-background border border-border text-textMuted cursor-not-allowed'}`}
               >
                 <Play size={20} />
                 {room.players.length < 2 ? 'Waiting for players...' : 'Start Game'}
               </button>
             ) : (
-              <div className="w-full py-4 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-full py-4 rounded-xl bg-background border border-border text-textMuted font-medium text-center flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-textMuted border-t-transparent rounded-full animate-spin"></div>
                 Waiting for host to start...
               </div>
             )}

@@ -45,20 +45,20 @@ const HomeView: React.FC = () => {
   return (
     <div className="w-full max-w-md animate-slide-up">
       <div className="text-center mb-10">
-        <h1 className="text-5xl font-extrabold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Word Chain</h1>
-        <p className="text-slate-400">The fast-paced multiplayer word game.</p>
+        <h1 className="text-5xl font-serif text-textMain mb-3">Word Chain</h1>
+        <p className="text-textMuted text-lg font-serif italic">The fast-paced multiplayer word game.</p>
       </div>
 
-      <div className="bg-surface rounded-2xl p-8 shadow-xl border border-slate-800">
-        <div className="flex gap-2 mb-8 p-1 bg-slate-800/50 rounded-xl border border-slate-700/50">
+      <div className="bg-surface rounded-2xl p-8 shadow-sm border border-border">
+        <div className="flex gap-2 mb-8 p-1 bg-background rounded-xl border border-border">
           <button 
-            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${!isJoining ? 'bg-primary text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${!isJoining ? 'bg-surface text-textMain shadow-sm border border-border' : 'text-textMuted hover:text-textMain hover:bg-surface/50'}`}
             onClick={() => setIsJoining(false)}
           >
             Create Room
           </button>
           <button 
-            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${isJoining ? 'bg-primary text-white shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-700/50'}`}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${isJoining ? 'bg-surface text-textMain shadow-sm border border-border' : 'text-textMuted hover:text-textMain hover:bg-surface/50'}`}
             onClick={() => setIsJoining(true)}
           >
             Join Room
@@ -67,13 +67,13 @@ const HomeView: React.FC = () => {
 
         <form onSubmit={isJoining ? handleJoin : handleCreate} className="space-y-5">
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-2 tracking-wide uppercase">Your Name</label>
+            <label className="block text-sm font-medium text-textMuted mb-2">Your Name</label>
             <input 
               type="text" 
               maxLength={15}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-textMain placeholder-textMuted/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               placeholder="Enter your name"
               required
             />
@@ -81,13 +81,13 @@ const HomeView: React.FC = () => {
 
           {isJoining && (
             <div className="animate-slide-up">
-              <label className="block text-sm font-bold text-slate-300 mb-2 tracking-wide uppercase">Room Code</label>
+              <label className="block text-sm font-medium text-textMuted mb-2">Room Code</label>
               <input 
                 type="text" 
                 maxLength={6}
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-mono uppercase tracking-widest text-xl"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-textMain placeholder-textMuted/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-mono uppercase tracking-widest text-xl"
                 placeholder="ABCDEF"
                 required
               />
@@ -96,9 +96,9 @@ const HomeView: React.FC = () => {
 
           <button 
             type="submit" 
-            className="w-full bg-gradient-to-r from-primary to-secondary hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
+            className="w-full bg-primary hover:bg-primary-hover text-white font-medium py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
           >
-            {isJoining ? <><LogIn size={20} /> Join Game</> : <><Keyboard size={20} /> Create Game</>}
+            {isJoining ? <><LogIn size={18} /> Join Game</> : <><Keyboard size={18} /> Create Game</>}
           </button>
         </form>
       </div>
