@@ -1,0 +1,160 @@
+import React, { useState } from 'react';
+import { useSocket } from '../../context/SocketContext';
+import { Copy, Users, Settings, Play, Check } from 'lucide-react';
+
+const LobbyView: React.FC = () => {
+  const { socket, room, playerId } = useSocket();
+  const [copied, setCopied] = useState(false);
+
+  if (!room || !socket) return null;
+
+  const isHost = room.players.find(p => p.id === playerId)?.isHost;
+  const shareableLink = `${window.location.origin}?room=${room.code}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(shareableLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const updateSetting = (key: keyof typeof room.settings, value: number) => {
+    if (!isHost) return;
+    socket.emit('update_settings', { ...room.settings, [key]: value });
+  };
+
+  const handleStart = () => {
+    if (isHost && room.players.length >= 2) {
+      socket.emit('start_game');
+    }
+  };
+
+  return (
+    <div className="w-full max-w-2xl animate-slide-up space-y-6">
+      
+      {/* Header & Link Share */}
+      <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50">
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-bold text-white mb-2">Room: <span className="text-primary font-mono tracking-widest">{room.code}</span></h2>
+          <p className="text-slate-400">Invite friends using the link below</p>
+        </div>
+        
+        <div className="flex items-center gap-2 bg-slate-800/80 p-2 rounded-xl border border-slate-700">
+          <input 
+            type="text" 
+            readOnly 
+            value={shareableLink}
+            className="bg-transparent flex-1 outline-none px-3 text-slate-300 font-medium truncate"
+          />
+          <button 
+            onClick={handleCopy}
+            className="bg-primary/20 hover:bg-primary/30 text-primary p-3 rounded-lg transition-colors flex items-center justify-center min-w-[48px]"
+            title="Copy link"
+          >
+            {copied ? <Check size={20} /> : <Copy size={20} />}
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Player List */}
+        <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 flex flex-col">
+          <div className="flex items-center gap-2 mb-4 text-slate-300">
+            <Users size={20} className="text-secondary" />
+            <h3 className="font-semibold text-lg">Players ({room.players.length}/8)</h3>
+          </div>
+          
+          <ul className="space-y-3 flex-1 overflow-y-auto max-h-[300px] pr-2">
+            {room.players.map((p, i) => (
+              <li key={p.id} className="flex items-center justify-between bg-slate-800/50 p-3 rounded-xl border border-slate-700/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-bold text-sm">
+                    {p.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className={`font-medium ${p.id === playerId ? 'text-white' : 'text-slate-300'}`}>
+                    {p.name} {p.id === playerId && '(You)'}
+                  </span>
+                </div>
+                {p.isHost && <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-md font-medium">Host</span>}
+                {!p.connected && <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-md font-medium">Offline</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Settings & Actions */}
+        <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 flex flex-col justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-4 text-slate-300">
+              <Settings size={20} className="text-primary" />
+              <h3 className="font-semibold text-lg">Game Settings</h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between mb-1">
+                  <label className="text-sm text-slate-400">Rounds</label>
+                  <span className="text-sm font-medium text-white">{room.settings.rounds}</span>
+                </div>
+                <input 
+                  type="range" min="1" max="15" 
+                  value={room.settings.rounds}
+                  onChange={(e) => updateSetting('rounds', parseInt(e.target.value))}
+                  disabled={!isHost}
+                  className={`w-full accent-primary ${!isHost && 'opacity-50 cursor-not-allowed'}`}
+                />
+              </div>
+              
+              <div>
+                <div className="flex justify-between mb-1">
+                  <label className="text-sm text-slate-400">Turn Timer</label>
+                  <span className="text-sm font-medium text-white">{room.settings.turnTimeSeconds}s</span>
+                </div>
+                <input 
+                  type="range" min="10" max="60" step="5"
+                  value={room.settings.turnTimeSeconds}
+                  onChange={(e) => updateSetting('turnTimeSeconds', parseInt(e.target.value))}
+                  disabled={!isHost}
+                  className={`w-full accent-secondary ${!isHost && 'opacity-50 cursor-not-allowed'}`}
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between mb-1">
+                  <label className="text-sm text-slate-400">Min Word Length</label>
+                  <span className="text-sm font-medium text-white">{room.settings.minWordLength}</span>
+                </div>
+                <input 
+                  type="range" min="2" max="5"
+                  value={room.settings.minWordLength}
+                  onChange={(e) => updateSetting('minWordLength', parseInt(e.target.value))}
+                  disabled={!isHost}
+                  className={`w-full accent-primary ${!isHost && 'opacity-50 cursor-not-allowed'}`}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            {isHost ? (
+              <button 
+                onClick={handleStart}
+                disabled={room.players.length < 2}
+                className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all transform ${room.players.length >= 2 ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
+              >
+                <Play size={20} />
+                {room.players.length < 2 ? 'Waiting for players...' : 'Start Game'}
+              </button>
+            ) : (
+              <div className="w-full py-4 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 font-medium text-center flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+                Waiting for host to start...
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LobbyView;
