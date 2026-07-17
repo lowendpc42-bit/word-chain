@@ -36,6 +36,7 @@ export interface RoomState {
   usedWords: string[];
   activePlayerId: string | null;
   turnDeadline: number | null;
+  turnsTaken: number;
   chat: ChatMessage[];
 }
 

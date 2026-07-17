@@ -15,6 +15,7 @@ export class Room {
   usedWords: Set<string> = new Set();
   activePlayerId: string | null = null;
   turnDeadline: number | null = null;
+  turnsTaken: number = 0;
   chat: ChatMessage[] = [];
 
   // Track who should start the next round
@@ -36,6 +37,7 @@ export class Room {
       usedWords: Array.from(this.usedWords),
       activePlayerId: this.activePlayerId,
       turnDeadline: this.turnDeadline,
+      turnsTaken: this.turnsTaken,
       chat: this.chat
     };
   }
@@ -81,6 +83,7 @@ export class Room {
     if (this.status !== 'lobby' || this.players.length < 2) return;
     this.status = 'playing';
     this.currentRound = 0;
+    this.turnsTaken = 0;
     this.usedWords.clear();
     this.players.forEach(p => p.score = 0);
     this.roundStarterIndex = 0;
@@ -97,6 +100,7 @@ export class Room {
     }
 
     this.status = 'playing';
+    this.turnsTaken = 0;
     const startingWord = GameLogic.getRandomStartingWord();
     this.chain = [{ word: startingWord, playerId: null }];
     this.usedWords.add(startingWord);
@@ -130,6 +134,9 @@ export class Room {
   }
 
   advanceTurn() {
+    if (this.status !== 'playing') return;
+    this.turnsTaken++;
+    
     const currentIndex = this.players.findIndex(p => p.id === this.activePlayerId);
     let nextIndex = (currentIndex + 1) % this.players.length;
     

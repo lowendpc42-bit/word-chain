@@ -49,31 +49,31 @@ const HomeView: React.FC = () => {
         <p className="text-slate-400">The fast-paced multiplayer word game.</p>
       </div>
 
-      <div className="bg-surface rounded-2xl p-6 shadow-xl border border-slate-700/50 backdrop-blur-sm">
-        <div className="flex gap-2 mb-6 p-1 bg-slate-800/50 rounded-lg">
+      <div className="bg-slate-900/40 rounded-3xl p-8 shadow-2xl border border-white/10 backdrop-blur-xl">
+        <div className="flex gap-2 mb-8 p-1 bg-white/5 rounded-xl border border-white/5">
           <button 
-            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${!isJoining ? 'bg-primary text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${!isJoining ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
             onClick={() => setIsJoining(false)}
           >
             Create Room
           </button>
           <button 
-            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${isJoining ? 'bg-primary text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${isJoining ? 'bg-white/10 text-white shadow-sm border border-white/10' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
             onClick={() => setIsJoining(true)}
           >
             Join Room
           </button>
         </div>
 
-        <form onSubmit={isJoining ? handleJoin : handleCreate} className="space-y-4">
+        <form onSubmit={isJoining ? handleJoin : handleCreate} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-1">Your Name</label>
+            <label className="block text-sm font-bold text-slate-300 mb-2 tracking-wide uppercase">Your Name</label>
             <input 
               type="text" 
               maxLength={15}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-inner"
               placeholder="Enter your name"
               required
             />
@@ -81,13 +81,13 @@ const HomeView: React.FC = () => {
 
           {isJoining && (
             <div className="animate-slide-up">
-              <label className="block text-sm font-medium text-slate-400 mb-1">Room Code</label>
+              <label className="block text-sm font-bold text-slate-300 mb-2 tracking-wide uppercase">Room Code</label>
               <input 
                 type="text" 
                 maxLength={6}
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-mono uppercase tracking-widest text-lg"
+                className="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-mono uppercase tracking-widest text-xl shadow-inner"
                 placeholder="ABCDEF"
                 required
               />

@@ -100,8 +100,23 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
 
       // Instead of ending the round, just advance the turn
       room.advanceTurn();
-      setupTurnTimer(room);
-      broadcastRoomUpdate(room);
+      
+      if (room.turnsTaken >= room.players.length * 3) {
+        room.endRound('turns_limit', undefined);
+        const scores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
+        io.to(room.code).emit('round_ended', { reason: 'turns_limit', scores });
+        broadcastRoomUpdate(room);
+
+        setTimeout(() => {
+          const r = roomManager.getRoom(room.code);
+          if (r && r.status === 'round-end') {
+            startNewRoundOrEndGame(r);
+          }
+        }, 5000);
+      } else {
+        setupTurnTimer(room);
+        broadcastRoomUpdate(room);
+      }
     });
 
     const reqLetter = room.chain.length > 0 ? room.chain[room.chain.length - 1].word.slice(-1) : '';
@@ -189,10 +204,22 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
       room.chat.push({ playerId: 'system', text: `${player.name} used a Skip!`, timestamp: Date.now() });
       
       room.advanceTurn();
-      // Need setupTurnTimer but wait, setupTurnTimer is defined earlier in the scope.
-      // Yes, setupTurnTimer is available here.
-      setupTurnTimer(room);
-      broadcastRoomUpdate(room);
+      if (room.turnsTaken >= room.players.length * 3) {
+        room.endRound('turns_limit', undefined);
+        const scores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
+        io.to(room.code).emit('round_ended', { reason: 'turns_limit', scores });
+        broadcastRoomUpdate(room);
+
+        setTimeout(() => {
+          const r = roomManager.getRoom(room.code);
+          if (r && r.status === 'round-end') {
+            startNewRoundOrEndGame(r);
+          }
+        }, 5000);
+      } else {
+        setupTurnTimer(room);
+        broadcastRoomUpdate(room);
+      }
     }
   });
 
@@ -271,11 +298,13 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
         updatedChain: room.chain
       });
 
-      if (room.chain.length >= 15) {
+      room.advanceTurn();
+
+      if (room.turnsTaken >= room.players.length * 3) {
         // Round completed successfully
-        room.endRound('chain_completed', undefined);
+        room.endRound('turns_limit', undefined);
         const scores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
-        io.to(room.code).emit('round_ended', { reason: 'chain_completed', scores });
+        io.to(room.code).emit('round_ended', { reason: 'turns_limit', scores });
         broadcastRoomUpdate(room);
 
         setTimeout(() => {
@@ -306,8 +335,23 @@ io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, 
 
       // Continue round, just advance turn
       room.advanceTurn();
-      setupTurnTimer(room);
-      broadcastRoomUpdate(room);
+      
+      if (room.turnsTaken >= room.players.length * 3) {
+        room.endRound('turns_limit', undefined);
+        const scores = room.players.reduce((acc, p) => ({ ...acc, [p.id]: p.score }), {});
+        io.to(room.code).emit('round_ended', { reason: 'turns_limit', scores });
+        broadcastRoomUpdate(room);
+
+        setTimeout(() => {
+          const r = roomManager.getRoom(room.code);
+          if (r && r.status === 'round-end') {
+            startNewRoundOrEndGame(r);
+          }
+        }, 5000);
+      } else {
+        setupTurnTimer(room);
+        broadcastRoomUpdate(room);
+      }
     }
   });
 
